@@ -25,10 +25,6 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Replace NPM_TOKEN in .npmrc
-        run: |
-          sed -i 's/\[NPM_TOKEN\]/${{ secrets.NPM_TOKEN }}/g' ~/.npmrc
-
       - name: Install dependencies
         run: npm install
         working-directory: .
