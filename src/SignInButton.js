@@ -9,6 +9,7 @@ const SignInButton = () => {
   const [agentNodeSku, setAgentNodeSku] = useState('DEFAULT');
   const [pipelineRunUrl, setPipelineRunUrl] = useState('');
   const [timestamp, setTimestamp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -42,10 +43,16 @@ const SignInButton = () => {
   const handleLogout = () => {
     msalInstance.logoutPopup();
     setUserName('');
+    setPipelineRunUrl('');
+    setTimestamp('');
+    setIsLoading(false);
   };
 
   const triggerPipeline = async (e) => {
     e.preventDefault(); // Prevent form submission from causing a page reload
+    setPipelineRunUrl(''); // Reset pipelineRunUrl
+    setTimestamp(''); // Reset timestamp
+    setIsLoading(true); //Reset loading state to true
     try {
       const response = await fetch('https://aio-ado-integration-ddarckbjhycdeec6.eastus2-01.azurewebsites.net/trigger-pipeline', {
         method: 'POST',
@@ -70,7 +77,10 @@ const SignInButton = () => {
       }
     } catch (error) {
       console.error('Error triggering pipeline:', error);
+    } finally {
+      setIsLoading(false); // Set loading state to false
     }
+    
   };
 
   return (
@@ -104,6 +114,12 @@ const SignInButton = () => {
             </div>
             <button type="submit">Trigger Pipeline</button>
           </form>
+          {isLoading && !pipelineRunUrl && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p>Pipeline is being run...</p>
+              <div className="loading-icon" style={{ marginLeft: '8px' }}></div> {/* Add your loading icon here */}
+            </div>
+          )}
           {pipelineRunUrl && (
             <div>
               <p>Timestamp: {timestamp}</p>
