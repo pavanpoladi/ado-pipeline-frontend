@@ -14,6 +14,12 @@ const SignInButton = () => {
     const initialize = async () => {
       await msalInstance.initialize();
       setIsInitialized(true);
+
+      // Handle redirect after login
+      const account = await msalInstance.handleRedirectPromise();
+      if (account) {
+        setUserName(account.name);
+      }
     };
     initialize();
   }, []);
