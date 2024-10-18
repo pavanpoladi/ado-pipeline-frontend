@@ -7,12 +7,9 @@ const SignInButton = () => {
   const [userName, setUserName] = useState('');
   const [clusterName, setClusterName] = useState('');
   const [agentNodeSku, setAgentNodeSku] = useState('DEFAULT');
-  const [releaseRole, setReleaseRole] = useState('CommonInfra');
-  const [releaseAction, setReleaseAction] = useState('CREATE_AND_DEPLOY');
   const [pipelineRunUrl, setPipelineRunUrl] = useState('');
   const [timestamp, setTimestamp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [clusterNameError, setClusterNameError] = useState('');
 
   useEffect(() => {
     const initialize = async () => {
@@ -51,18 +48,8 @@ const SignInButton = () => {
     setIsLoading(false);
   };
 
-  const validateClusterName = (name) => {
-    const regex = /^[a-z][a-z0-9-]*$/;
-    return regex.test(name);
-  };
-
   const triggerPipeline = async (e) => {
     e.preventDefault(); // Prevent form submission from causing a page reload
-    if (!validateClusterName(clusterName)) {
-      setClusterNameError('Cluster name must start with a lowercase letter and can only contain lowercase letters, numbers, and hyphens.');
-      return;
-    }
-    setClusterNameError(''); // Clear error message if valid
     setPipelineRunUrl(''); // Reset pipelineRunUrl
     setTimestamp(''); // Reset timestamp
     setIsLoading(true); //Reset loading state to true
@@ -74,9 +61,7 @@ const SignInButton = () => {
             },
         body: JSON.stringify({
             clusterName,
-            agentNodeSku,
-            releaseRole,
-            releaseAction
+            agentNodeSku
         })
       });
       if (response.ok) {
@@ -113,15 +98,9 @@ const SignInButton = () => {
                 <input
                   type="text"
                   value={clusterName}
-                  onChange={(e) => {
-                    setClusterName(e.target.value);
-                    if (validateClusterName(e.target.value)) {
-                      setClusterNameError(''); // Clear error message if valid
-                    }
-                  }}
+                  onChange={(e) => setClusterName(e.target.value)}
                 />
               </label>
-              {clusterNameError && <p style={{ color: 'red', fontSize: '12px', fontWeight: 'normal' }}>{clusterNameError}</p>}
             </div>
             <div>
               <label>
@@ -131,34 +110,6 @@ const SignInButton = () => {
                   value={agentNodeSku}
                   onChange={(e) => setAgentNodeSku(e.target.value)}
                 />
-              </label>
-            </div>
-            <div>
-            <label>
-                TEAM:
-                <select value={releaseRole} onChange={(e) => setReleaseRole(e.target.value)}>
-                  <option value="CommonInfra">CommonInfra (Default)</option>
-                  <option value="Akri">Akri</option>
-                  <option value="MQ">MQ</option>
-                  <option value="OPCUA">OPCUA</option>
-                  <option value="ADR">ADR</option>
-                  <option value="DOE">DOE</option>
-                  <option value="Infra-INT">Infra-INT</option>
-                  <option value="Infra-Release">Infra-Release</option>
-                  <option value="Atlas">Atlas</option>
-                  <option value="AIO-Private-RP">AIO-Private-RP</option>
-                  <option value="ADRState">ADRState</option>
-                </select>
-              </label>
-            </div>
-            <div>
-              <label>
-                Action:
-                <select value={releaseAction} onChange={(e) => setReleaseAction(e.target.value)}>
-                  <option value="CREATE_AND_DEPLOY">Create and Deploy (Default)</option>
-                  <option value="CREATE">Create</option>
-                  <option value="DEPLOY">Deploy</option>
-                </select>
               </label>
             </div>
             <button type="submit">Trigger Pipeline</button>
